@@ -2,6 +2,8 @@
 
 A native macOS desktop widget that displays real-time **CNN Fear & Greed Index** and **CBOE VIX** data. Built with SwiftUI/WidgetKit and a Node.js backend proxy.
 
+> **⚠️ Disclaimer:** This is an [Antigravity](https://github.com/google-deepmind/antigravity) test/learning project. It is **not** intended for commercial use, business purposes, or any form of profit. Use at your own discretion.
+
 ![macOS 14+](https://img.shields.io/badge/macOS-14%2B-blue)
 ![Swift 5.9](https://img.shields.io/badge/Swift-5.9-orange)
 ![Node.js 18+](https://img.shields.io/badge/Node.js-18%2B-green)
@@ -221,6 +223,10 @@ Google Finance may temporarily block requests. Wait a minute and retry. The prox
 | Validation    | Zod                                                   |
 | Testing       | Vitest                                                |
 | Data Sources  | CNN Fear & Greed API, Google Finance                  |
+
+## Disclaimer
+
+This project was built as part of an **Antigravity** coding exercise for educational and experimental purposes only. It is **not** designed for production deployment, commercial use, or profit. The data displayed is sourced from third-party APIs (CNN, Google Finance) and may be subject to their respective terms of service.
 
 ## License
 
