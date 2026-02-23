@@ -6,6 +6,12 @@ A native macOS desktop widget that displays real-time **CNN Fear & Greed Index**
 ![Swift 5.9](https://img.shields.io/badge/Swift-5.9-orange)
 ![Node.js 18+](https://img.shields.io/badge/Node.js-18%2B-green)
 
+## Preview
+
+<p align="center">
+  <img src="docs/assets/widget-preview.png" alt="Fear & Greed + VIX Widget" width="400" />
+</p>
+
 ## Features
 
 | Size                   | Content                                          | Refresh      |
@@ -19,11 +25,42 @@ A native macOS desktop widget that displays real-time **CNN Fear & Greed Index**
 
 ## Architecture
 
-```
-┌─────────────────┐     ┌─────────────────┐     ┌───────────────────┐
-│  macOS Widget    │────▶│  Node.js Proxy   │────▶│  CNN / Google     │
-│  (SwiftUI)       │     │  (localhost:8080) │     │  Finance APIs     │
-└─────────────────┘     └─────────────────┘     └───────────────────┘
+```mermaid
+flowchart LR
+    subgraph Widget["🖥️ macOS Widget (SwiftUI)"]
+        W_SM["Small\n(Fear & Greed only)"]
+        W_MD["Medium\n(F&G + VIX)"]
+    end
+
+    subgraph Backend["⚙️ Node.js Proxy (localhost:8080)"]
+        direction TB
+        IDX["index.ts\nMiddleware\n(rate limit · headers · routing)"]
+        R_FG["routes/feargreed.ts"]
+        R_VIX["routes/vix.ts"]
+        S_CNN["services/cnn.ts"]
+        S_VIX["services/vix.ts"]
+        Z_CNN["schemas/cnn.ts\n(Zod validation)"]
+        Z_VIX["schemas/vix.ts\n(Zod validation)"]
+
+        IDX -->|"GET /"| R_FG
+        IDX -->|"GET /vix"| R_VIX
+        R_FG --> S_CNN
+        R_VIX --> S_VIX
+        S_CNN --> Z_CNN
+        S_VIX --> Z_VIX
+    end
+
+    subgraph External["🌐 External APIs"]
+        CNN["CNN\nFear & Greed\nAPI"]
+        GOOG["Google Finance\nVIX:INDEXCBOE"]
+    end
+
+    W_SM -->|"HTTP GET /"| IDX
+    W_MD -->|"HTTP GET /\nHTTP GET /vix"| IDX
+    S_CNN -->|"fetch + User-Agent"| CNN
+    S_VIX -->|"fetch + User-Agent"| GOOG
+    Z_CNN -.->|"validated JSON"| R_FG
+    Z_VIX -.->|"validated JSON"| R_VIX
 ```
 
 **Why a proxy?** CNN and Google Finance block direct API requests from non-browser clients. The Node.js proxy adds the required `User-Agent` header and validates responses with [Zod](https://zod.dev/).
